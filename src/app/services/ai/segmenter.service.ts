@@ -108,7 +108,25 @@ export class SegmenterService implements AIBaseService<SegmenterPrediction> {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    return;
+    const prediction = this.predictions.value[0]?.data[0];
+    if (!prediction) return;
+    const maskCanvas = new OffscreenCanvas(
+      prediction.mask.width,
+      prediction.mask.height
+    );
+    const maskCtx = maskCanvas.getContext('2d');
+    if (!maskCtx) {
+      return;
+    }
+    maskCtx.putImageData(prediction.mask, 0, 0);
+    ctx.globalCompositeOperation = 'destination-atop';
+    ctx.drawImage(
+      maskCanvas,
+      0,
+      0,
+      prediction.mask.width,
+      prediction.mask.height
+    );
   }
 }
 

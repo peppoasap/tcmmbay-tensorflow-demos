@@ -106,6 +106,7 @@ export class FacemeshService implements AIBaseService<FacemeshPrediction> {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    ctx.globalCompositeOperation = 'source-over';
     ctx.strokeStyle = 'white';
     ctx.fillStyle = 'white';
     ctx.lineWidth = 0.2;
