@@ -151,31 +151,31 @@ import { RouterLink } from '@angular/router';
                 </div>
                 <div
                   class="bg-muted rounded-md min-h-32 flex flex-col justify-center items-center gap-2"
-                  (click)="selectedEffect.set('assets/effects/dog-filter.png')"
+                  (click)="selectedEffect.set('assets/effects/cap.png')"
                   [class.bg-orange-200]="
-                    selectedEffect() === 'assets/effects/dog-filter.png'
+                    selectedEffect() === 'assets/effects/cap.png'
                   "
                 >
                   <img
-                    src="assets/effects/dog-filter.png"
+                    src="assets/effects/cap.png"
                     alt="dog"
                     class="max-h-16"
                   />
-                  Dog
+                  Cap
                 </div>
                 <div
                   class="bg-muted rounded-md min-h-32 flex flex-col justify-center items-center gap-2"
-                  (click)="selectedEffect.set('assets/effects/anon-mask.png')"
+                  (click)="selectedEffect.set('assets/effects/sponge.png')"
                   [class.bg-orange-200]="
-                    selectedEffect() === 'assets/effects/anon-mask.png'
+                    selectedEffect() === 'assets/effects/sponge.png'
                   "
                 >
                   <img
-                    src="assets/effects/anon-mask.png"
-                    alt="anon-mask"
+                    src="assets/effects/sponge.png"
+                    alt="sponge"
                     class="max-h-16"
                   />
-                  Anonymouse
+                  Sponge
                 </div>
               </div>
             </div>
@@ -390,6 +390,26 @@ export class MeetPage implements AfterViewInit {
     const nose = prediction.annotations.noseTip;
     const moustache = prediction.annotations.moustache;
     const lips = prediction.annotations.lipsUpperOuter;
+    const silhouette = prediction.annotations.silhouette;
+
+    switch (this.selectedEffect()) {
+      case 'assets/effects/moustache.png':
+        this.drawMoustache(ctx, moustache, lips);
+        break;
+      case 'assets/effects/cap.png':
+        this.drawCapFilter(ctx, silhouette, nose);
+        break;
+      case 'assets/effects/sponge.png':
+        this.drawSpongeFilter(ctx, silhouette, leftEye, rightEye, nose);
+        break;
+    }
+  }
+
+  drawMoustache(
+    ctx: CanvasRenderingContext2D,
+    moustache: Point[],
+    lips: Point[]
+  ) {
     const imageWidth =
       Math.abs(moustache[0].x - moustache[moustache.length - 1].x) + 20;
     const imageHeight = Math.abs(lips[5].y - moustache[1].y) + 20;
@@ -398,6 +418,50 @@ export class MeetPage implements AfterViewInit {
       this.effect(),
       moustache[0].x - 10,
       moustache[1].y - imageHeight / 2,
+      imageWidth,
+      imageHeight
+    );
+  }
+
+  drawCapFilter(
+    ctx: CanvasRenderingContext2D,
+    silhouette: Point[],
+    nose: Point[]
+  ) {
+    const rightUpper = silhouette[4];
+    const leftUpper = silhouette[32];
+    const rightLower = silhouette[13];
+    const leftLower = silhouette[23];
+    const imageWidth = Math.abs(rightUpper.x - leftUpper.x) * 2;
+    const imageHeight = 180;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(
+      this.effect(),
+      nose[0].x - imageWidth / 2 - 25,
+      rightUpper.y - imageHeight,
+      imageWidth,
+      imageHeight
+    );
+  }
+
+  drawSpongeFilter(
+    ctx: CanvasRenderingContext2D,
+    silhouette: Point[],
+    leftEye: Point[],
+    rightEye: Point[],
+    nose: Point[]
+  ) {
+    const rightUpper = silhouette[4];
+    const leftUpper = silhouette[32];
+    const rightLower = silhouette[13];
+    const leftLower = silhouette[23];
+    const imageWidth = Math.abs(rightUpper.x - leftUpper.x) * 2;
+    const imageHeight = Math.abs(rightUpper.y - rightLower.y) * 1.3;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(
+      this.effect(),
+      leftEye[0].x - imageWidth / 2 - 40,
+      leftEye[0].y - imageHeight / 2 + 20,
       imageWidth,
       imageHeight
     );
